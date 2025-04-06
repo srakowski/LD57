@@ -10,17 +10,15 @@ class Conwin
 
     private readonly int _height;
 
-    public Vector2 Pos;
-
-    public Conwin(int rows, int columns)
+    public Conwin(int width, int height)
     {
-        _buffer = new ConwinCell[columns, rows];
-        _width = columns;
-        _height = rows;
+        _buffer = new ConwinCell[width, height];
+        _width = width;
+        _height = height;
 
-        for (var x = 0; x < columns; x++)
+        for (var x = 0; x < width; x++)
         {
-            for (var y = 0; y < rows; y++)
+            for (var y = 0; y < height; y++)
             {
                 _buffer[x, y].Value = null;
             }
@@ -36,28 +34,18 @@ class Conwin
         }
     }
 
-    public void WriteLine(string value)
-    {
-        foreach (var c in value)
-        {
-            _buffer[_cursorPos.X, _cursorPos.Y].Value = c;
-            AdvanceCursorX();
-        }
-        AdvanceCursorY();
-    }
-
     private void AdvanceCursorX()
     {
         _cursorPos.X++;
         if (_cursorPos.X >= _width)
         {
+            _cursorPos.X = 0;
             AdvanceCursorY();
         }
     }
 
     private void AdvanceCursorY()
     {
-        _cursorPos.X = 0;
         _cursorPos.Y++;
         if (_cursorPos.Y >= _height)
         {
@@ -73,12 +61,10 @@ class Conwin
             {
                 _buffer[x, _height - 1] = new();
             }
-
-            _cursorPos.Y--;
         }
     }
 
-    public void Draw(SpriteBatch sb)
+    public void Draw(SpriteBatch sb, Vector2 at)
     {
         if (Font.Texture is null)
         {
@@ -98,7 +84,7 @@ class Conwin
 
                 sb.Draw(
                     Font.Texture,
-                    Pos + new Vector2(x * Font.CharWidth, y * (Font.CharHeight + 4)),
+                    at + new Vector2(x * Font.CharWidth, y * Font.CharHeight),
                     Font.GetSourceRectangle(v.Value.Value),
                     v.Color ?? Color.White
                 );
